@@ -21,4 +21,17 @@ public class ToDoService {
         ToDo toDo=new ToDo(UUID.randomUUID().toString(), newtoDo.description(),newtoDo.status());
         return toDoRepository.save(toDo);
     }
+
+    public ToDo getToDoById(String id) {
+        return toDoRepository.findById(id).orElseThrow();
+    }
+
+    public ToDo editToDo(String id, ToDo toDoAfterEdit) {
+        ToDo updatedToDo = toDoRepository.findById(id).get().withDescription(toDoAfterEdit.description()).withStatus(toDoAfterEdit.status());
+        return  toDoRepository.save(updatedToDo);
+    }
+
+    public void deleteToDo(String id) {
+        toDoRepository.deleteById(id);
+    }
 }
