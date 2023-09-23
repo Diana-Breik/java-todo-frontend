@@ -9,6 +9,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -71,5 +73,83 @@ class ToDoControllerTest {
                .andExpect(jsonPath("$.id").isNotEmpty());
    }
 
+    @Test
+    @DirtiesContext
+    void getToDoByID() throws Exception {
+        //GIVEN
+        String id= "1";
+        ToDo todo = new ToDo(id,"testGetToDoByID",Status.OPEN);
+        toDoRepository.save(todo);
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/todo/"+ id))
 
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        
+                          {
+                          "id": "1",
+                          "description": "testGetToDoByID",
+                          "status": "OPEN"
+                          }
+
+                        
+"""));
+
+    }
+
+    @Test
+    @DirtiesContext
+    void editToDo() throws Exception {
+        //GIVEN
+        String id= "1";
+        ToDo todo = new ToDo(id,"testEditToDo",Status.OPEN);
+        toDoRepository.save(todo);
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/todo/"+ id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                           {
+                           "id":"1",
+                           "description": "testEditToDo",
+                           "status": "DONE" 
+}
+"""))
+
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        
+                          {
+                          "id":"1",
+                           "description": "testEditToDo",
+                           "status": "DONE"
+                          }
+
+                        
+"""));
+
+    }
+
+
+    @Test
+    @DirtiesContext
+    void deleteToDo() throws Exception {
+        //GIVEN
+        String id= "1";
+        ToDo todo = new ToDo(id,"testDeleteToDo",Status.OPEN);
+        toDoRepository.save(todo);
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/todo/"+ id))
+
+
+                //THEN
+                .andExpect(status().isOk());
+
+        Optional<ToDo> todoTest = toDoRepository.findById(id);
+        assertTrue(todoTest.isEmpty());
+
+    }
 }
